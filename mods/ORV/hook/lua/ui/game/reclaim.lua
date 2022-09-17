@@ -1,6 +1,7 @@
 local MathFloor = math.floor
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import("/lua/lazyvar.lua")
+local MathMax = math.max
 
 local function ComputeLabelProperties(mass)
     if mass < 10 then
@@ -174,34 +175,71 @@ local function CreateReclaimLabel(view, recl)
     return label
 end
 
-local ReclaimTotal
-local LabelRes = LayoutHelpers.ScaleNumber(30)
-
 local function SumReclaim(r1, r2)
     local massSum = r1.mass + r2.mass
-
-    local r = {
-        mass = massSum,
-        count = r1.count + (r2.count or 1),
-        position = Vector((r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum, r1.position[2],
-            (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum),
-        max = math.max(r1.max or r1.mass, r2.mass)
-    }
-    return r
+    r1.count = r1.count + (r2.count or 1)
+    r1.position[1] = (r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum
+    r1.position[3] = (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum
+    r1.max = MathMax(r1.max or r1.mass, r2.mass)
+    r1.mass = massSum
+    return r1
 end
 
 local function CompareMass(a, b)
     return a.mass > b.mass
 end
 
+
+local HEIGHT_RATIO = 0.012
+
+
+local function CombineReclaim(reclaim)
+    local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
+    local minDist = zoom * HEIGHT_RATIO
+    local minDistSq = minDist * minDist
+    local index = 1
+    local combinedReclaim = {}
+
+    local added
+
+    local x1
+    local x2
+    local y1
+    local y2
+    local dx
+    local dy
+
+    for _, r in reclaim do
+        added = false
+        x1 = r.position[1]
+        y1 = r.position[3]
+        for _, cr in combinedReclaim do
+            x2 = cr.position[1]
+            y2 = cr.position[3]
+            dx = x1 - x2
+            dy = y1 - y2
+            if dx * dx + dy * dy < minDistSq then
+                added = true
+                SumReclaim(cr, r)
+                break
+            end
+        end
+        if not added then
+            combinedReclaim[index] = {
+                mass = r.mass,
+                position = r.position,
+                count = 1
+            }
+            index = index + 1
+        end
+    end
+    return combinedReclaim
+end
+
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
-    local heightRes = MathFloor(view.Height() / LabelRes)
-    local reclaimMatrix = {}
-    local secondPassMatrix
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
-    local onScreenMassTotal = 0
 
     local tl = UnProject(view, Vector2(view.Left(), view.Top()))
     local tr = UnProject(view, Vector2(view.Right(), view.Top()))
@@ -209,8 +247,8 @@ function UpdateLabels()
     local bl = UnProject(view, Vector2(view.Left(), view.Bottom()))
 
 
-    local x0 = 0
-    local y0 = 0
+    local x0
+    local y0
     local x1 = tl[1]
     local y1 = tl[3]
     local x2 = tr[1]
@@ -230,10 +268,10 @@ function UpdateLabels()
     local x43 = (x4 - x3)
     local x14 = (x1 - x4)
 
-    local s1 = 0
-    local s2 = 0
-    local s3 = 0
-    local s4 = 0
+    local s1
+    local s2
+    local s3
+    local s4
 
     local function Contains(point)
         x0 = point[1]
@@ -252,55 +290,31 @@ function UpdateLabels()
         end
     end
 
+
+    onScreenReclaims = CombineReclaim(onScreenReclaims)
+
+
     table.sort(onScreenReclaims, CompareMass)
 
-    for _, r in onScreenReclaims do
-        local proj = view:Project(r.position)
-        onScreenMassTotal = onScreenMassTotal + r.mass
-        local rx = MathFloor(proj.x / LabelRes)
-        local ry = MathFloor(proj.y / LabelRes)
-        if reclaimMatrix[ry] then
-            if reclaimMatrix[ry][rx] then
-                reclaimMatrix[ry][rx] = SumReclaim(reclaimMatrix[ry][rx], r)
-            else
-                reclaimMatrix[ry][rx] = {
-                    mass = r.mass,
-                    position = r.position,
-                    count = 1
-                }
-            end
-        else
-            reclaimMatrix[ry] = {}
-            reclaimMatrix[ry][rx] = {
-                mass = r.mass,
-                position = r.position,
-                count = 1
-            }
-        end
-
-    end
-
-
-
     local labelIndex = 1
-    for _, line in reclaimMatrix do
-        for _, recl in line do
-            if labelIndex > MaxLabels then
-                break
-            end
-            local label = LabelPool[labelIndex]
-            if label and IsDestroyed(label) then
-                label = nil
-            end
-            if not label then
-                label = CreateReclaimLabel(view.ReclaimGroup, recl)
-                LabelPool[labelIndex] = label
-            end
 
-            label:DisplayReclaim(recl)
-            labelIndex = labelIndex + 1
+    for _, recl in onScreenReclaims do
+        if labelIndex > MaxLabels then
+            break
         end
+        local label = LabelPool[labelIndex]
+        if label and IsDestroyed(label) then
+            label = nil
+        end
+        if not label then
+            label = CreateReclaimLabel(view.ReclaimGroup, recl)
+            LabelPool[labelIndex] = label
+        end
+
+        label:DisplayReclaim(recl)
+        labelIndex = labelIndex + 1
     end
+
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
         local label = LabelPool[index]

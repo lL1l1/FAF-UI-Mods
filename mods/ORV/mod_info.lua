@@ -1,10 +1,10 @@
-name = "your mod name"
+name = "Optimized Reclaim View"
 version = 1
 copyright = ""
-description = "your description"
-author = "you"
+description = "No more 0 FPS when reclaim is displayed"
+author = "4z0t"
 url = ""
-uid = "your-mod-uid"
+uid = "optimized-reclaim-view-v01"
 icon = "/mods/ORV/icon.png"
 selectable = true
 enabled = true
