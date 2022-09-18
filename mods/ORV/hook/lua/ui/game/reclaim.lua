@@ -3,6 +3,7 @@ local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import("/lua/lazyvar.lua")
 local MathMax = math.max
 local MathMin = math.min
+local TableGetn = table.getn
 
 local function ComputeLabelProperties(mass)
     if mass < 10 then
@@ -190,8 +191,16 @@ local function CompareMass(a, b)
     return a.mass > b.mass
 end
 
+local function CompareMaxMass(a, b)
+    return (a.max or a.mass) > (b.max or b.mass)
+end
+
 local HEIGHT_RATIO = 0.012
-local ZOOM_THRESHOLD = 100
+local ZOOM_THRESHOLD = 60
+
+local reclaimDataPool = {}
+local totalReclaimData = 0
+
 
 local function CombineReclaim(reclaim)
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
@@ -230,11 +239,23 @@ local function CombineReclaim(reclaim)
             end
         end
         if not added then
-            combinedReclaim[index] = {
-                mass = r.mass,
-                position = r.position,
-                count = 1
-            }
+            if index > totalReclaimData then
+                reclaimDataPool[index] = {
+                    mass = r.mass,
+                    position = Vector(0, 0, 0),
+                    count = 1
+                }
+                totalReclaimData = totalReclaimData + 1
+            end
+            local rd = reclaimDataPool[index]
+            rd.mass = r.mass
+            rd.max = r.mass
+            rd.count = 1
+            local v = rd.position
+            v[1] = x1
+            v[2] = r.position[2]
+            v[3] = y1
+            combinedReclaim[index] = rd
             index = index + 1
         end
     end
@@ -258,6 +279,12 @@ local function IsInMapArea(pos)
 end
 
 function UpdateLabels()
+
+    if TableGetn(Reclaim) < totalReclaimData then
+        totalReclaimData = 0
+        reclaimDataPool = {}
+    end
+
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
