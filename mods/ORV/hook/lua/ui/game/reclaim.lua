@@ -2,6 +2,7 @@ local MathFloor = math.floor
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import("/lua/lazyvar.lua")
 local MathMax = math.max
+local MathMin = math.min
 
 local function ComputeLabelProperties(mass)
     if mass < 10 then
@@ -251,7 +252,7 @@ local function IsInMapArea(pos)
     if PlayableArea then
         return pos[1] > PlayableArea[1] and pos[1] < PlayableArea[3] or
             pos[3] > PlayableArea[2] and pos[3] < PlayableArea[4]
-    else    
+    else
         return pos[1] > 0 and pos[1] < mapWidth or pos[3] > 0 and pos[3] < mapHeight
     end
 end
@@ -268,7 +269,8 @@ function UpdateLabels()
 
 
     local checkForContainment = IsInMapArea(tl) or IsInMapArea(tr) or IsInMapArea(bl) or IsInMapArea(br)
-    
+
+
     local x0
     local y0
     local x1 = tl[1]
@@ -279,6 +281,11 @@ function UpdateLabels()
     local y3 = br[3]
     local x4 = bl[1]
     local y4 = bl[3]
+
+    local minX = MathMin(x1, x2, x3, x4)
+    local maxX = MathMax(x1, x2, x3, x4)
+    local minY = MathMin(y1, y2, y3, y4)
+    local maxY = MathMax(y1, y2, y3, y4)
 
 
     local y21 = (y2 - y1)
@@ -298,6 +305,9 @@ function UpdateLabels()
     local function Contains(point)
         x0 = point[1]
         y0 = point[3]
+        if x0 < minX or x0 > maxX or y0 < minY or y0 > maxY then
+            return false
+        end
         s1 = (x1 - x0) * y21 - x21 * (y1 - y0)
         s2 = (x2 - x0) * y32 - x32 * (y2 - y0)
         s3 = (x3 - x0) * y43 - x43 * (y3 - y0)
