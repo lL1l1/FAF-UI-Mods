@@ -190,10 +190,15 @@ local function CompareMass(a, b)
 end
 
 local HEIGHT_RATIO = 0.012
-
+local ZOOM_THRESHOLD = 100
 
 local function CombineReclaim(reclaim)
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
+
+    if zoom < ZOOM_THRESHOLD then
+        return reclaim
+    end
+
     local minDist = zoom * HEIGHT_RATIO
     local minDistSq = minDist * minDist
     local index = 1
