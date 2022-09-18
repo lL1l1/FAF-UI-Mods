@@ -189,7 +189,6 @@ local function CompareMass(a, b)
     return a.mass > b.mass
 end
 
-
 local HEIGHT_RATIO = 0.012
 
 
@@ -236,6 +235,22 @@ local function CombineReclaim(reclaim)
     return combinedReclaim
 end
 
+local mapWidth = 0
+local mapHeight = 0
+function SetMapSize()
+    mapWidth = SessionGetScenarioInfo().size[1]
+    mapHeight = SessionGetScenarioInfo().size[2]
+end
+
+local function IsInMapArea(pos)
+    if PlayableArea then
+        return pos[1] > PlayableArea[1] and pos[1] < PlayableArea[3] or
+            pos[3] > PlayableArea[2] and pos[3] < PlayableArea[4]
+    else    
+        return pos[1] > 0 and pos[1] < mapWidth or pos[3] > 0 and pos[3] < mapHeight
+    end
+end
+
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
     local onScreenReclaimIndex = 1
@@ -247,6 +262,8 @@ function UpdateLabels()
     local bl = UnProject(view, Vector2(view.Left(), view.Bottom()))
 
 
+    local checkForContainment = IsInMapArea(tl) or IsInMapArea(tr) or IsInMapArea(bl) or IsInMapArea(br)
+    
     local x0
     local y0
     local x1 = tl[1]
@@ -284,7 +301,7 @@ function UpdateLabels()
     end
 
     for _, r in Reclaim do
-        if r.mass >= MinAmount and Contains(r.position) then
+        if r.mass >= MinAmount and (not checkForContainment or Contains(r.position)) then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
         end
