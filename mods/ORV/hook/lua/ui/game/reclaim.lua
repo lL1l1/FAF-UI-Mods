@@ -188,7 +188,7 @@ local function SumReclaim(r1, r2)
 end
 
 local function CompareMass(a, b)
-    return a.mass > b.mass
+    return a.mass < b.mass
 end
 
 local function CompareMaxMass(a, b)
@@ -206,13 +206,12 @@ local function CombineReclaim(reclaim)
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
     if zoom < ZOOM_THRESHOLD then
-        return reclaim
+        return false
     end
 
     local minDist = zoom * HEIGHT_RATIO
     local minDistSq = minDist * minDist
-    local index = 1
-    local combinedReclaim = {}
+    local index = 0
 
     local added
 
@@ -227,7 +226,8 @@ local function CombineReclaim(reclaim)
         added = false
         x1 = r.position[1]
         y1 = r.position[3]
-        for _, cr in combinedReclaim do
+        for i = 1, index do
+            cr = reclaimDataPool[i]
             x2 = cr.position[1]
             y2 = cr.position[3]
             dx = x1 - x2
@@ -239,6 +239,7 @@ local function CombineReclaim(reclaim)
             end
         end
         if not added then
+            index = index + 1
             if index > totalReclaimData then
                 reclaimDataPool[index] = {
                     mass = r.mass,
@@ -255,11 +256,13 @@ local function CombineReclaim(reclaim)
             v[1] = x1
             v[2] = r.position[2]
             v[3] = y1
-            combinedReclaim[index] = rd
-            index = index + 1
         end
     end
-    return combinedReclaim
+    for i = index + 1, totalReclaimData do
+        reclaimDataPool[i].mass = 0
+    end
+
+    return index
 end
 
 local mapWidth = 0
@@ -350,28 +353,47 @@ function UpdateLabels()
     end
 
 
-    onScreenReclaims = CombineReclaim(onScreenReclaims)
+    local size = CombineReclaim(onScreenReclaims)
 
 
-    table.sort(onScreenReclaims, CompareMass)
+    table.sort(reclaimDataPool, CompareMass)
 
     local labelIndex = 1
+    if size then
+        for i = 1, size do
+            recl = reclaimDataPool[i]
+            if labelIndex > MaxLabels then
+                break
+            end
+            local label = LabelPool[labelIndex]
+            if label and IsDestroyed(label) then
+                label = nil
+            end
+            if not label then
+                label = CreateReclaimLabel(view.ReclaimGroup, recl)
+                LabelPool[labelIndex] = label
+            end
 
-    for _, recl in onScreenReclaims do
-        if labelIndex > MaxLabels then
-            break
+            label:DisplayReclaim(recl)
+            labelIndex = labelIndex + 1
         end
-        local label = LabelPool[labelIndex]
-        if label and IsDestroyed(label) then
-            label = nil
-        end
-        if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup, recl)
-            LabelPool[labelIndex] = label
-        end
+    else
+        for _, recl in onScreenReclaims do
+            if labelIndex > MaxLabels then
+                break
+            end
+            local label = LabelPool[labelIndex]
+            if label and IsDestroyed(label) then
+                label = nil
+            end
+            if not label then
+                label = CreateReclaimLabel(view.ReclaimGroup, recl)
+                LabelPool[labelIndex] = label
+            end
 
-        label:DisplayReclaim(recl)
-        labelIndex = labelIndex + 1
+            label:DisplayReclaim(recl)
+            labelIndex = labelIndex + 1
+        end
     end
 
     -- Hide labels we didn't use
