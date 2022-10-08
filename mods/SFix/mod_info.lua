@@ -1,8 +1,8 @@
 name = "Selection Fix"
-uid = "selection-fix-v01"
-version = 1
+uid = "selection-fix-v02"
+version = 2
 copyright = ""
-description = [[Fixes selection sound bug due to UI-Party or Supreme Economy or Common Mod Tools or ...]]
+description = [[Fixes selection sound bug due to mods conflicting with UI MOD TOOLS]]
 author = "4z0t"
 url = ""
 selectable = true
@@ -16,5 +16,6 @@ before = {}
 after = {
     "8c28a269-8655-4639-8e54-3d311fc376f8",
     "022E3DB4-9C00-5ED7-9876-4866D316E015",
+    "d2e4b420-339a-4766-9293-681b27f92ef8",
     "zcbf6277-24e3-437a-b968-Common-v1"
 }

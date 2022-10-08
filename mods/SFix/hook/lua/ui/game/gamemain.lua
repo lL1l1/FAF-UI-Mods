@@ -1,8 +1,7 @@
-local originalOnSelectionChanged = OnSelectionChanged
-
-function OnSelectionChanged(oldSelection, newSelection, added, removed)
-    if ignoreSelection then
-        return
+do
+    local OriginalOnSelectionChanged = OnSelectionChanged
+    function OnSelectionChanged(oldSelection, newSelection, added, removed)
+        if ignoreSelection then return end
+        OriginalOnSelectionChanged(oldSelection, newSelection, added, removed)
     end
-    originalOnSelectionChanged(oldSelection, newSelection, added, removed)
 end
