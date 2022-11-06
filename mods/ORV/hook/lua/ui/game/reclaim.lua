@@ -1,5 +1,5 @@
 local MathFloor = math.floor
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import("/lua/lazyvar.lua")
 local MathMax = math.max
 local MathMin = math.min
@@ -63,13 +63,11 @@ if VERSION >= 3745 then
             LayoutFor(self.mass)
                 :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
                 :AtCenterIn(self)
-                :End()
 
             LayoutFor(self.text)
                 :Color('ffc7ff8f')
                 :Above(self.mass, 2)
                 :AtHorizontalCenterIn(self)
-                :End()
 
             self:DisableHitTest(true)
             self:SetNeedsFrameUpdate(true)
