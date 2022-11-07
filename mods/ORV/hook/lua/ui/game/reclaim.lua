@@ -51,7 +51,7 @@ if VERSION >= 3745 then
 
             self.Top:Set(0)
             self.Left:Set(0)
-            LayoutHelpers.SetDimensions(self, 25, 25)
+            LayoutHelpers.SetDimensions(self, 10, 10)
 
             self.mass = Bitmap(self)
             self.text = UIUtil.CreateText(self, "", 10, UIUtil.bodyFont, true)
