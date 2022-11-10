@@ -96,6 +96,7 @@ if VERSION >= 3745 then
                 local mass = tostring(math.floor(0.5 + r.mass))
                 self.text:SetText(mass)
                 self.oldMass = r.mass
+                LayoutHelpers.DepthOverParent(self, self:GetParent(), r.mass)
             end
             self:AdjustToValue(r.max or r.mass)
         end,
