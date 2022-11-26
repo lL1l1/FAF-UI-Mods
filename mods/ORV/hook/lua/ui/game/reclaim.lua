@@ -4,7 +4,7 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-local VERSION = import("/lua/version.lua").GetVersion()
+local VERSION = tonumber(import("/lua/version.lua").GetVersion())
 
 local function ComputeLabelProperties(mass)
     if mass <= 10 then

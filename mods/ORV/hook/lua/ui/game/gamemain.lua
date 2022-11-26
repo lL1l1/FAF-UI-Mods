@@ -1,4 +1,4 @@
-if import("/lua/version.lua").GetVersion() < 3745 then
+if tonumber(import("/lua/version.lua").GetVersion()) < 3745 then
     local OldCreateUI = CreateUI
     function CreateUI(isReplay)
         OldCreateUI(isReplay)
