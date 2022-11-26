@@ -36,7 +36,7 @@ local function ComputeLabelProperties(mass)
 end
 
 if VERSION >= 3745 then
-
+    LOG("-------------LOADING NEW VERSION---------------")
     HeightRatio = 0.012
 
     ---@type WorldLabel
@@ -103,7 +103,7 @@ if VERSION >= 3745 then
     }
 
 else
-
+    LOG("-------------LOADING OLD VERSION---------------")
 
 
     ReclaimLabel = Class(WorldLabel)
