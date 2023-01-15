@@ -35,6 +35,35 @@ local function ComputeLabelProperties(mass)
     return 'fffb0303', 25
 end
 
+local function ComputeLabelPropertiesBatched(totalMass, maxMass)
+    if totalMass <= 10 then
+        return nil, nil
+    end
+    -- change color according to mass value
+    if maxMass < 100 then
+        return 'ffc7ff8f', 10
+    end
+
+    if maxMass < 300 then
+        return 'ffd7ff05', 12
+    end
+
+    if maxMass < 600 then
+        return 'ffffeb23', 17
+    end
+
+    if maxMass < 1000 then
+        return 'ffff9d23', 20
+    end
+
+    if maxMass < 2000 then
+        return 'ffff7212', 22
+    end
+
+    -- > 2000
+    return 'fffb0303', 25
+end
+
 if VERSION >= 3745 then
     LOG("-------------LOADING NEW VERSION---------------")
     HeightRatio = 0.012
@@ -71,8 +100,8 @@ if VERSION >= 3745 then
         --- Adjusts the world label based on the value it represents
         ---@param self WorldLabel
         ---@param value any
-        AdjustToValue = function(self, value)
-            local color, size = ComputeLabelProperties(value)
+        AdjustToValue = function(self, total, max)
+            local color, size = ComputeLabelPropertiesBatched(total, max or total)
             if color then
                 self.text:SetFont(UIUtil.bodyFont, size) -- r.mass > 2000
                 self.text:SetColor(color)
@@ -98,7 +127,7 @@ if VERSION >= 3745 then
                 self.oldMass = r.mass
                 LayoutHelpers.DepthOverParent(self, self:GetParent(), r.mass)
             end
-            self:AdjustToValue(r.max or r.mass)
+            self:AdjustToValue(r.mass, r.max)
         end,
     }
 
