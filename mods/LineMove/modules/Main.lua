@@ -3,7 +3,12 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Group = import('/lua/maui/group.lua').Group
 local CommandMode = import("/lua/ui/game/commandmode.lua")
+
+
+local KEY_CODES = table.inverse(import("/lua/keymap/keyNames.lua").keyNames)
 local TRACKED_KEY = "Q"
+
+
 
 
 local toCommandType = {
@@ -72,6 +77,12 @@ MouseMonitor = Class(Group)
         self.prevPosition  = false
     end,
 
+
+    -- if event.Type == 'KeyDown' then
+    --     if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
+    --         closeButton:OnClick()
+    --     end
+    -- end
 
     IsStartEvent = function(self, event)
         return event.Type == "ButtonPress" and event.Modifiers.Right
