@@ -142,25 +142,30 @@ MouseMonitor = Class(Group)
         local currentSegmentLength = distBetween
         local curUnitPosition = 1
 
-        
-        for i = 1, table.getn(self.points) - 1 do
-            local p1 = self.points[i].position
+        local pointsCount = table.getn(self.points)
+        local prevPoint   = nil
+        local i           = 1
+        while i < pointsCount do
+            local p1 = prevPoint or self.points[i].position
             local p2 = self.points[i + 1].position
             local dist = VDist3(p1, p2)
             if dist > currentSegmentLength then
                 local s = currentSegmentLength / dist
-                self.unitPositions[curUnitPosition].position = {
+                prevPoint = {
                     MATH_Lerp(s, 0, p2[1] - p1[1]) + p1[1],
                     MATH_Lerp(s, 0, p2[2] - p1[2]) + p1[2],
                     MATH_Lerp(s, 0, p2[3] - p1[3]) + p1[3],
                 }
+                self.unitPositions[curUnitPosition].position = prevPoint
                 curUnitPosition = curUnitPosition + 1
-                currentSegmentLength = distBetween - (dist - currentSegmentLength)
+                currentSegmentLength = distBetween
                 if curUnitPosition > unitCount then
                     break
                 end
             else
                 currentSegmentLength = currentSegmentLength - dist
+                prevPoint = p2
+                i = i + 1
             end
         end
     end,
