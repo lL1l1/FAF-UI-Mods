@@ -10,11 +10,6 @@ KeyMapper.SetUserKeyAction("Line move", {
     category = "order"
 })
 
-
-function Start()
-    import("/lua/ui/game/worldview.lua").viewLeft._mouseMonitor:StartLineMove()
-end
-
 local KEY_CODES = (function()
     local keyNames = import("/lua/keymap/keyNames.lua").keyNames
     local result = {}
@@ -23,10 +18,12 @@ local KEY_CODES = (function()
     end
     return result
 end)()
-local TRACKED_KEY = "Q"
+local TRACKED_KEY = "1"
 
 
-
+function Start()
+    import("/lua/ui/game/worldview.lua").viewLeft._mouseMonitor:StartLineMove()
+end
 
 local toCommandType = {
     ["RULEUCC_Move"] = "Move",
@@ -41,19 +38,19 @@ local toCommandType = {
 }
 
 
-local function GiveOrder(unit, position, orderType)
-    ForkThread(
-        function()
-            SimCallback({
-                Func = "GiveOrders",
-                Args = {
-                    unit_orders = { { CommandType = orderType, Position = position } },
-                    unit_id     = unit:GetEntityId(),
-                    From        = GetFocusArmy()
-                }
-            }, false)
-        end
-    )
+local function GiveOrders(orders, orderType)
+
+    for id, position in orders do
+        SimCallback({
+            Func = "GiveOrders",
+            Args = {
+                unit_orders = { { CommandType = orderType, Position = position } },
+                unit_id     = id,
+                From        = GetFocusArmy()
+            }
+        }, false)
+    end
+
 end
 
 Point = Class(Bitmap)
@@ -108,6 +105,10 @@ MouseMonitor = Class(Group)
 
     StartLineMove = function(self)
         LOG("start")
+        self.selection = GetSelectedUnits()
+        if not self.selection then
+            return
+        end
         self.pressed = true
         self:InitPositions(GetMouseWorldPos())
         self:AddPoint(GetMouseWorldPos())
@@ -153,7 +154,6 @@ MouseMonitor = Class(Group)
     end,
 
     InitPositions = function(self, position)
-        self.selection = GetSelectedUnits()
         for i = 1, table.getn(self.selection) do
             local point = Point(self, self:GetParent(), position)
             LayoutFor(point)
@@ -237,14 +237,15 @@ MouseMonitor = Class(Group)
             'Move'
 
         local curPos = 1
+        local orders = {}
         for _, unit in self.selection do
             if unit:IsDead() then continue end
 
-            GiveOrder(unit, self.unitPositions[curPos].position, orderType)
-
-            curPos = curPos + 1
+            orders[unit:GetEntityId()] = self.unitPositions[curPos].position
+            curPos                     = curPos + 1
         end
 
+        GiveOrders(orders, orderType)
     end
 
 
