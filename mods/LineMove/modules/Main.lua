@@ -3,9 +3,26 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Group = import('/lua/maui/group.lua').Group
 local CommandMode = import("/lua/ui/game/commandmode.lua")
+local KeyMapper = import("/lua/keymap/keymapper.lua")
+
+KeyMapper.SetUserKeyAction("Line move", {
+    action = "UI_Lua import(\"/mods/LineMove/modules/Main.lua\").Start()",
+    category = "order"
+})
 
 
-local KEY_CODES = table.inverse(import("/lua/keymap/keyNames.lua").keyNames)
+function Start()
+    import("/lua/ui/game/worldview.lua").viewLeft._mouseMonitor:StartLineMove()
+end
+
+local KEY_CODES = (function()
+    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
+    local result = {}
+    for k, v in keyNames do
+        result[v] = STR_xtoi(k)
+    end
+    return result
+end)()
 local TRACKED_KEY = "Q"
 
 
@@ -96,24 +113,48 @@ MouseMonitor = Class(Group)
         return event.Type == "ButtonRelease" and self.pressed and not event.Modifiers.Right
     end,
 
+    StartLineMove = function(self)
+        LOG("start")
+        self.pressed = true
+        self:InitPositions(GetMouseWorldPos())
+        self:AddPoint(GetMouseWorldPos())
+        self:AcquireKeyboardFocus(true)
+    end,
+
+
+    EndLineMove = function(self)
+        LOG("end")
+        self.pressed = false
+        self.prevPosition = false
+        self:GiveOrders()
+        self.selection = false
+        self:DestroyPoints()
+        self:AbandonKeyboardFocus()
+    end,
+
+
+    IsCancelEvent = function(self, event)
+        if not self.pressed then return false end
+
+        if event.Type == "ButtonPress" then
+            return true
+        elseif event.Type == 'KeyUp' then
+            return event.KeyCode == KEY_CODES[TRACKED_KEY]
+        end
+        return false
+    end,
 
     ---@param MouseMonitor WorldView
     ---@param event KeyEvent
     HandleEvent = function(self, event)
         --if not event.Modifiers.Right then return end
-
-        if self:IsStartEvent(event) then
-            self.pressed = true
-            self:InitPositions(GetMouseWorldPos())
-            self:AddPoint(GetMouseWorldPos())
-        elseif self:IsMoveEvent(event) then
+        --LOG(event.Type)
+        if self:IsMoveEvent(event) then
             self:AddPoint(GetMouseWorldPos())
         elseif self:IsEndEvent(event) then
-            self.pressed = false
-            self.prevPosition = false
-            self:GiveOrders()
-            self.selection = false
-            self:DestroyPoints()
+
+        elseif self:IsCancelEvent(event) then
+            self:EndLineMove()
         end
 
     end,
