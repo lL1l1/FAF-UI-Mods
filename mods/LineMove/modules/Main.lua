@@ -1,3 +1,5 @@
+local VDist3, MATH_Lerp = VDist3, MATH_Lerp
+
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Dragger = import("/lua/maui/dragger.lua").Dragger
@@ -210,12 +212,12 @@ MouseMonitor = Class(Group)
             local dist = VDist3(p1, p2)
             if dist > currentSegmentLength then
                 local s = currentSegmentLength / dist
-                prevPoint = {
-                    MATH_Lerp(s, 0, p2[1] - p1[1]) + p1[1],
-                    MATH_Lerp(s, 0, p2[2] - p1[2]) + p1[2],
-                    MATH_Lerp(s, 0, p2[3] - p1[3]) + p1[3],
-                }
-                self.unitPositions[curUnitPosition].position = prevPoint
+                prevPoint = self.unitPositions[curUnitPosition].position
+
+                prevPoint[1] = MATH_Lerp(s, 0, p2[1] - p1[1]) + p1[1]
+                prevPoint[2] = MATH_Lerp(s, 0, p2[2] - p1[2]) + p1[2]
+                prevPoint[3] = MATH_Lerp(s, 0, p2[3] - p1[3]) + p1[3]
+
                 curUnitPosition = curUnitPosition + 1
                 currentSegmentLength = distBetween
                 if curUnitPosition > unitCount then
