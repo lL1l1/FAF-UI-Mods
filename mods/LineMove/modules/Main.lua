@@ -214,9 +214,9 @@ MouseMonitor = Class(Group)
                 local s = currentSegmentLength / dist
                 prevPoint = self.unitPositions[curUnitPosition].position
 
-                prevPoint[1] = MATH_Lerp(s, 0, p2[1] - p1[1]) + p1[1]
-                prevPoint[2] = MATH_Lerp(s, 0, p2[2] - p1[2]) + p1[2]
-                prevPoint[3] = MATH_Lerp(s, 0, p2[3] - p1[3]) + p1[3]
+                prevPoint[1] = MATH_Lerp(s, p1[1], p2[1])
+                prevPoint[2] = MATH_Lerp(s, p1[2], p2[2])
+                prevPoint[3] = MATH_Lerp(s, p1[3], p2[3])
 
                 curUnitPosition = curUnitPosition + 1
                 currentSegmentLength = distBetween
