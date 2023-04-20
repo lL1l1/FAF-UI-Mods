@@ -31,12 +31,7 @@ local toCommandType = {
     ["RULEUCC_Move"] = "Move",
     ["RULEUCC_Attack"] = "Attack",
     ["RULEUCC_Guard"] = "Guard",
-    ["RULEUCC_Patrol"] = "Patrol",
-    ["RULEUCC_Repair"] = "Repair",
-    ["RULEUCC_Capture"] = "Capture",
-    ["RULEUCC_Nuke"] = "Nuke",
-    ["RULEUCC_Tactical"] = "Tactical",
-    ["RULEUCC_Teleport"] = "Teleport",
+    ["RULEUCC_Tactical"] = "Tactical"
 }
 
 
@@ -106,7 +101,6 @@ MouseMonitor = Class(Group)
     end,
 
     StartLineMove = function(self)
-        LOG("start")
         self.selection = GetSelectedUnits()
         if not self.selection then
             return
@@ -119,7 +113,6 @@ MouseMonitor = Class(Group)
 
 
     EndLineMove = function(self)
-        LOG("end")
         self.pressed = false
         self.prevPosition = false
         self:GiveOrders()
