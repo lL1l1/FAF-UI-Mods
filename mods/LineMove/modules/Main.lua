@@ -94,13 +94,6 @@ MouseMonitor = Class(Group)
         self.prevPosition  = false
     end,
 
-
-    -- if event.Type == 'KeyDown' then
-    --     if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 342 then
-    --         closeButton:OnClick()
-    --     end
-    -- end
-
     IsStartEvent = function(self, event)
         return event.Type == "ButtonPress" and event.Modifiers.Right
     end,
