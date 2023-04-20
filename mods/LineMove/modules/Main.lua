@@ -3,7 +3,7 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Group = import('/lua/maui/group.lua').Group
 local CommandMode = import("/lua/ui/game/commandmode.lua")
-
+local TRACKED_KEY = "Q"
 
 
 local toCommandType = {
@@ -72,18 +72,32 @@ MouseMonitor = Class(Group)
         self.prevPosition  = false
     end,
 
+
+    IsStartEvent = function(self, event)
+        return event.Type == "ButtonPress" and event.Modifiers.Right
+    end,
+
+    IsMoveEvent = function(self, event)
+        return event.Type == "MouseMotion" and self.pressed
+    end,
+
+    IsEndEvent = function(self, event)
+        return event.Type == "ButtonRelease" and self.pressed and not event.Modifiers.Right
+    end,
+
+
     ---@param MouseMonitor WorldView
     ---@param event KeyEvent
     HandleEvent = function(self, event)
         --if not event.Modifiers.Right then return end
 
-        if event.Type == "ButtonPress" and event.Modifiers.Right then
+        if self:IsStartEvent(event) then
             self.pressed = true
             self:InitPositions(GetMouseWorldPos())
             self:AddPoint(GetMouseWorldPos())
-        elseif event.Type == "MouseMotion" and self.pressed then
+        elseif self:IsMoveEvent(event) then
             self:AddPoint(GetMouseWorldPos())
-        elseif event.Type == "ButtonRelease" and self.pressed and not event.Modifiers.Right then
+        elseif self:IsEndEvent(event) then
             self.pressed = false
             self.prevPosition = false
             self:GiveOrders()
