@@ -1,5 +1,6 @@
 local VDist3, MATH_Lerp = VDist3, MATH_Lerp
 
+local Prefs = import('/lua/user/prefs.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Dragger = import("/lua/maui/dragger.lua").Dragger
@@ -13,15 +14,22 @@ KeyMapper.SetUserKeyAction("Line move", {
 })
 
 local KEY_CODES = (function()
-    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
+    local keyNames = import("ASCIInames.lua").names
     local result = {}
     for k, v in keyNames do
         result[v] = STR_xtoi(k)
     end
     return result
 end)()
-local TRACKED_KEY = "1"
 
+local function GetKeyBind()
+    for key, value in Prefs.GetFromCurrentProfile('UserKeyMap') do
+        if value == "Line move" then
+            LOG(key)
+            return KEY_CODES[key]
+        end
+    end
+end
 
 function Start()
     import("/lua/ui/game/worldview.lua").viewLeft._mouseMonitor:StartLineMove()
@@ -128,7 +136,10 @@ MouseMonitor = Class(Group)
         if event.Type == "ButtonPress" then
             return true
         elseif event.Type == 'KeyUp' then
-            return event.KeyCode == KEY_CODES[TRACKED_KEY]
+            local bind = GetKeyBind()
+            LOG(bind)
+            LOG(event.KeyCode)
+            return event.KeyCode == bind
         end
         return false
     end,
