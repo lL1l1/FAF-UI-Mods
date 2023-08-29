@@ -53,6 +53,58 @@ allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160)
 local armyViewHeight = 20
 local outOfGameColor = "ffa0a0a0"
 
+local function GetSmallFactionIcon(factionIndex)
+    return "/mods/4sb/textures/" .. import('/lua/factions.lua').Factions[factionIndex + 1].Key .. "_ico.dds.dds"
+end
+
+local colors =
+{
+    "ffff0000", --red
+    "ffFF4500", --OrangeRed
+    "ffFFA500", --Orange
+    "ffffFf00", --yellow
+    "ff00ff00", --lime
+    "ff00FA9A", --MediumSpringGreen
+    "ff00FFFF", --aqua
+    "ff9ACD32", --YellowGreen
+    "FFFF00FF", --Magenta
+    "FFE6E6FA", --Lavender
+    "FF0000FF", --bLUE
+    "FF00BFFF", --DeepSkyBlue
+    "FF000080", --NAVY
+
+
+}
+TIME_INTERVAL = 1
+
+
+function ColorDif(c1, c2)
+    local r1, g1, b1 = ColorUtils.UnpackColor(c1)
+    local r2, g2, b2 = ColorUtils.UnpackColor(c2)
+    return r1 - r2, g1 - g2, b1 - b2
+end
+
+local RGBBitmap = Class(Bitmap)
+{
+    _maskcolor = "ffffffff",
+    _color_time = TIME_INTERVAL,
+    OnFrame = function(self, deltaTime)
+        self._color_time = self._color_time + deltaTime
+        if self._color_time >= TIME_INTERVAL then
+            self._target_color           = table.random(colors)
+            self._r, self._g, self._b    = ColorUtils.UnpackColor(self._maskcolor)
+            self._dr, self._dg, self._db = ColorDif(self._target_color, self._maskcolor)
+            self._color_time             = 0
+        end
+        local coef = self._color_time / TIME_INTERVAL
+        local _r = math.floor(self._r + self._dr * coef)
+        local _g = math.floor(self._g + self._dg * coef)
+        local _b = math.floor(self._b + self._db * coef)
+        self._maskcolor = ColorUtils.ColorRGBA(_r, _g, _b)
+        self:SetColorMask(self._maskcolor)
+    end,
+}
+
 ---@class ArmyView : Group
 ---@field isOutOfGame boolean
 ---@field id integer
@@ -89,7 +141,7 @@ ArmyView = UMT.Class(Group)
         self._bg = Bitmap(self)
         self._div = Bitmap(self)
         self._color = Bitmap(self)
-        self._faction = Bitmap(self)
+        self._faction = RGBBitmap(self)
         self._rating = Text(self)
         self._name = Text(self)
     end,
@@ -120,6 +172,7 @@ ArmyView = UMT.Class(Group)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 4)
             :Over(self, 10)
+            :NeedsFrameUpdate(true)
             :DisableHitTest()
 
         LayoutFor(self._div)
@@ -152,6 +205,7 @@ ArmyView = UMT.Class(Group)
         LayoutFor(self)
             :Width(armyViewWidth)
             :Height(armyViewHeight)
+
     end,
 
     ---Sets static data for view
@@ -190,7 +244,8 @@ ArmyView = UMT.Class(Group)
 
         self:ResetFont()
 
-        self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
+        self._faction:SetTexture(UIUtil.UIFile(GetSmallFactionIcon(faction)), 0)
+        self._faction:SetColorMask(armyColor)
     end,
 
     ResetFont = function(self)
