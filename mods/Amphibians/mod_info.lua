@@ -1,0 +1,11 @@
+name = "Amphibians"
+uid = "b2c1ff32-4ab0-4889-8ffa-143bdb31famp"
+version = 1
+copyright = ""
+icon = "/mods/Amphibians/icon.png"
+description = "Adds amphibiansicons"
+author = "4z0t"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
