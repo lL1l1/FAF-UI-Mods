@@ -1,9 +1,9 @@
 name = "Amphibians"
-uid = "b2c1ff32-4ab0-4889-8ffa-143bdb31famp"
+uid = "amphibian-icons-4z0t-v01"
 version = 1
 copyright = ""
 icon = "/mods/Amphibians/icon.png"
-description = "Adds amphibiansicons"
+description = "Adds amphibians icons for Wagner, Blaze, Riptide and Yenzyne"
 author = "4z0t"
 selectable = true
 enabled = true
