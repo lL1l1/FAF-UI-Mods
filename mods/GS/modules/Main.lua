@@ -1,6 +1,5 @@
 local CM = import("/lua/ui/game/commandmode.lua")
 local GM = import("/lua/ui/game/gamemain.lua")
-local KeyMapper = import('/lua/keymap/keymapper.lua')
 local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
 
 
@@ -131,11 +130,14 @@ function Main(isReplay)
     GM.ObserveSelection:AddObserver(OnSelectionChanged)
 end
 
-KeyMapper.SetUserKeyAction('Quick Group Scatter', {
-    action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(false)',
-    category = 'Group Scatter'
-})
-KeyMapper.SetUserKeyAction('Continuous Group Scatter', {
-    action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(true)',
-    category = 'Group Scatter'
-})
+do
+    local KeyMapper = import('/lua/keymap/keymapper.lua')
+    KeyMapper.SetUserKeyAction('Quick Group Scatter', {
+        action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(false)',
+        category = 'Group Scatter'
+    })
+    KeyMapper.SetUserKeyAction('Continuous Group Scatter', {
+        action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(true)',
+        category = 'Group Scatter'
+    })
+end
