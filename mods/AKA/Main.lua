@@ -135,7 +135,7 @@ CategoryMatcher("Fancy Description")
     CategoryAction(categories.TRANSPORTATION)
         :Action "StartCommandMode order RULEUCC_Transport",
     CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
-        :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
+        :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
     CategoryAction()
         :Match(function(selection)
             return selection |
