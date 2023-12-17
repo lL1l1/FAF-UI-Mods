@@ -121,7 +121,7 @@ CategoryAction = Class()
             elseif iscallable(action) then
                 action(selection)
             else
-                error()
+                error("unknown type of action")
             end
         end
     end
