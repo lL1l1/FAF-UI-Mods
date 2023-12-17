@@ -117,7 +117,7 @@ CategoryAction = Class()
         for _, action in self._actions do
             if type(action) == "string" then
                 ConExecute(action)
-            elseif type(action) == "function" then
+            elseif iscallable(action) then
                 action(selection)
             else
                 error()
