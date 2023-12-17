@@ -31,6 +31,7 @@ CategoryMatcher = Class()
 ---@class CategoryAction
 ---@field _actions Action[]
 ---@field _category? EntityCategory
+---@field _matcher false|fun(selection:UserUnit[]?):boolean
 CategoryAction = Class()
 {
     ---@param self CategoryAction
@@ -38,6 +39,7 @@ CategoryAction = Class()
     __init = function(self, category)
         self._actions = {}
         self._category = category
+        self._matcher = false
     end,
 
     ---Add action into list
@@ -51,11 +53,22 @@ CategoryAction = Class()
     ---Match category and selected units
     ---@param self CategoryAction
     ---@param selection UserUnit[]?
-    Match = function(self, selection)
+    Matches = function(self, selection)
+        if self._matcher then
+            return self._matcher(selection)
+        end
         return (not self._category and not selection)
             or
             (self._category and selection and
                 TableGetN(EntityCategoryFilterDown(self._category, selection)) == TableGetN(selection))
+    end,
+
+    ---Set custom category matcher
+    ---@param self CategoryAction
+    ---@param matcher fun(selection:UserUnit[]?):boolean
+    Match = function(self, matcher)
+        self._matcher = matcher
+        return self
     end,
 
     ---Process the action
@@ -63,7 +76,7 @@ CategoryAction = Class()
     ---@param selection UserUnit[]?
     ---@return boolean
     Process = function(self, selection)
-        if self:Match(selection) then
+        if self:Matches(selection) then
             self:Execute(selection)
             return true
         end
