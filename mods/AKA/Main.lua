@@ -31,7 +31,7 @@ CategoryMatcher = Class()
 ---@class CategoryAction
 ---@field _actions Action[]
 ---@field _category? EntityCategory
----@field _matcher false|fun(selection:UserUnit[]?):boolean
+---@field _matcher false|fun(selection:UserUnit[]?, category:EntityCategory?):boolean
 CategoryAction = Class()
 {
     ---@param self CategoryAction
@@ -55,7 +55,7 @@ CategoryAction = Class()
     ---@param selection UserUnit[]?
     Matches = function(self, selection)
         if self._matcher then
-            return self._matcher(selection)
+            return self._matcher(selection, self._category)
         end
         return (not self._category and not selection)
             or
@@ -65,7 +65,7 @@ CategoryAction = Class()
 
     ---Set custom category matcher
     ---@param self CategoryAction
-    ---@param matcher fun(selection:UserUnit[]?):boolean
+    ---@param matcher fun(selection:UserUnit[]?, category:EntityCategory?):boolean
     Match = function(self, matcher)
         self._matcher = matcher
         return self
@@ -110,6 +110,9 @@ local customActions =
         CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
             :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
         CategoryAction(categories.FACTORY * categories.STRUCTURE)
+            :Match(function(selection)
+                return selection | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
+            end)
             :Action(function(selection)
                 local isRepeatBuild = selection
                     | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
