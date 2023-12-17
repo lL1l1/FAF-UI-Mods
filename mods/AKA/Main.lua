@@ -1,4 +1,5 @@
 local TableGetN = table.getn
+local iscallable = iscallable
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 
 
