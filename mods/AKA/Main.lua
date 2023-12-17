@@ -1,50 +1,67 @@
-local KeyMapper = import("/lua/keymap/keymapper.lua")
+local TableGetN = table.getn
+local EntityCategoryFilterDown = EntityCategoryFilterDown
 
 ---@class CategoryMatcher
+---@field description string
+---@field _actions CategoryAction[]
 CategoryMatcher = Class()
 {
     __init = function(self, description)
-
+        self.description = description
     end,
 
     __call = function(self, actions)
-
+        self._actions = actions
+        return self
     end,
-    Process = function(self, selection)
 
-    end
+    ---@param self CategoryMatcher
+    ---@param selection UserUnit[]?
+    Process = function(self, selection)
+        for _, action in ipairs(self._actions) do
+            if action:Process(selection) then
+                break
+            end
+        end
+    end,
 }
 
 ---@alias Action string | fun(selection:UserUnit[])
 
 ---@class CategoryAction
 ---@field _actions Action[]
----@field _category EntityCategory
+---@field _category? EntityCategory
 CategoryAction = Class()
 {
-    ---@param self any
-    ---@param category any
+    ---@param self CategoryAction
+    ---@param category? EntityCategory
     __init = function(self, category)
         self._actions = {}
         self._category = category
     end,
 
-    ---comment
+    ---Add action into list
     ---@param self CategoryAction
     ---@param action Action
     Action = function(self, action)
         table.insert(self._actions, action)
+        return self
     end,
 
-    ---comment
+    ---Match category and selected units
     ---@param self CategoryAction
+    ---@param selection UserUnit[]?
     Match = function(self, selection)
-
-        return false
+        return (not self._category and not selection)
+            or
+            (self._category and selection and
+                TableGetN(EntityCategoryFilterDown(self._category, selection)) == TableGetN(selection))
     end,
 
-    ---comment
+    ---Process the action
     ---@param self CategoryAction
+    ---@param selection UserUnit[]?
+    ---@return boolean
     Process = function(self, selection)
         if self:Match(selection) then
             self:Execute(selection)
@@ -53,8 +70,8 @@ CategoryAction = Class()
         return false
     end,
 
-    ---comment
     ---@param self CategoryAction
+    ---@param selection UserUnit[]?
     Execute = function(self, selection)
         for _, action in self._actions do
             if type(action) == "string" then
@@ -70,7 +87,7 @@ CategoryAction = Class()
 
 local LuaQ = UMT.LuaQ
 
-local actions =
+local customActions =
 {
     ["some_fany_name"] = CategoryMatcher("Fancy Description")
     {
@@ -92,8 +109,29 @@ local actions =
     },
 }
 
+---@type table<string, CategoryMatcher>
+local categotyActions = {}
+function ProcessAction(name)
+    if not categotyActions[name] then
+        WARN("Huh?")
+        return
+    end
+    categotyActions[name]:Process(GetSelectedUnits())
+end
+
+---@param actions table<string, CategoryMatcher>
+function RegisterActions(actions)
+    for name, action in actions do
+        categotyActions[name] = action
+        import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
+            {
+                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction(" .. name .. ")",
+                category = "AKA"
+            })
+        import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] = action.description
+    end
+end
 
 function Main()
-
-
+    RegisterActions(customActions)
 end
