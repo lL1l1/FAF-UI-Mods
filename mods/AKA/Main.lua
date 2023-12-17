@@ -136,17 +136,21 @@ CategoryMatcher("Fancy Description")
         :Action "StartCommandMode order RULEUCC_Transport",
     CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
         :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
-    CategoryAction(categories.FACTORY * categories.STRUCTURE)
+    CategoryAction()
         :Match(function(selection)
-            return selection | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
+            return selection |
+                LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' or unit:IsInCategory 'EXTERNALFACTORY' end)
         end)
         :Action(function(selection)
             local isRepeatBuild = selection
-                | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+                | LuaQ.all(function(_, unit) return unit:IsRepeatQueue() end)
                 and 'false'
                 or 'true'
             for _, unit in selection do
                 unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
+                    unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                end
             end
         end)
 }
