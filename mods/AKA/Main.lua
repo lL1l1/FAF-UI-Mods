@@ -54,13 +54,14 @@ CategoryAction = Class()
     ---@param self CategoryAction
     ---@param selection UserUnit[]?
     Matches = function(self, selection)
+        local category = self._category
         if self._matcher then
-            return self._matcher(selection, self._category)
+            return self._matcher(selection, category)
         end
-        return (not self._category and not selection)
+        return (not category and not selection)
             or
-            (self._category and selection and
-                TableGetN(EntityCategoryFilterDown(self._category, selection)) == TableGetN(selection))
+            (category and selection and
+                TableGetN(EntityCategoryFilterDown(category, selection)) == TableGetN(selection))
     end,
 
     ---Set custom category matcher
