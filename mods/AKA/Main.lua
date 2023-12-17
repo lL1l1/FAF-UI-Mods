@@ -15,7 +15,7 @@ CategoryMatcher = Class()
     end
 }
 
----@alias Action string|fun(selection:UserUnit[])
+---@alias Action string | fun(selection:UserUnit[])
 
 ---@class CategoryAction
 ---@field _actions Action[]
@@ -31,7 +31,7 @@ CategoryAction = Class()
 
     ---comment
     ---@param self CategoryAction
-    ---@param action any
+    ---@param action Action
     Action = function(self, action)
         table.insert(self._actions, action)
     end,
@@ -68,7 +68,7 @@ CategoryAction = Class()
     end
 }
 
-
+local LuaQ = UMT.LuaQ
 
 local actions =
 {
@@ -79,6 +79,16 @@ local actions =
             :Action "StartCommandMode order RULEUCC_Transport",
         CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
             :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
+        CategoryAction(categories.FACTORY * categories.STRUCTURE)
+            :Action(function(selection)
+                local isRepeatBuild = selection
+                    | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+                    and 'false'
+                    or 'true'
+                for _, unit in selection do
+                    unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                end
+            end)
     },
 }
 
