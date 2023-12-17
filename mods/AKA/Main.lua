@@ -1,6 +1,17 @@
 local TableGetN = table.getn
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 
+
+---@type table<string, CategoryMatcher>
+local categotyActions = {}
+function ProcessAction(name)
+    if not categotyActions[name] then
+        WARN("Attempt to use action " .. name .. " which wasn't registered")
+        return
+    end
+    categotyActions[name]:Process(GetSelectedUnits())
+end
+
 ---@class CategoryMatcher
 ---@field description string
 ---@field _actions CategoryAction[]
@@ -12,7 +23,23 @@ CategoryMatcher = Class()
 
     __call = function(self, actions)
         self._actions = actions
+        self:Register()
         return self
+    end,
+
+    ---@param self CategoryMatcher
+    Register = function(self)
+        local name = self.description:gsub("[^A-Za-z0-9]+", "_")
+        categotyActions[name] = self
+        import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
+            {
+                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction('" .. name .. "')",
+                category = "AKA"
+            })
+        if import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] then
+            WARN(("Overwriting key action description of '%s'"):format(name))
+        end
+        import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] = self.description
     end,
 
     ---@param self CategoryMatcher
@@ -101,54 +128,28 @@ CategoryAction = Class()
 
 local LuaQ = UMT.LuaQ
 
-local customActions =
+CategoryMatcher("Fancy Description")
 {
-    ["some_fany_name"] = CategoryMatcher("Fancy Description")
-    {
-        CategoryAction(), -- do nothing if no selection
-        CategoryAction(categories.TRANSPORTATION)
-            :Action "StartCommandMode order RULEUCC_Transport",
-        CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
-            :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
-        CategoryAction(categories.FACTORY * categories.STRUCTURE)
-            :Match(function(selection)
-                return selection | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
-            end)
-            :Action(function(selection)
-                local isRepeatBuild = selection
-                    | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
-                    and 'false'
-                    or 'true'
-                for _, unit in selection do
-                    unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                end
-            end)
-    },
+    CategoryAction(), -- do nothing if no selection
+    CategoryAction(categories.TRANSPORTATION)
+        :Action "StartCommandMode order RULEUCC_Transport",
+    CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
+        :Action "UI_Lua import('/lua/ui/game/orders.lua').EnterOverchargeMode()",
+    CategoryAction(categories.FACTORY * categories.STRUCTURE)
+        :Match(function(selection)
+            return selection | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
+        end)
+        :Action(function(selection)
+            local isRepeatBuild = selection
+                | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+                and 'false'
+                or 'true'
+            for _, unit in selection do
+                unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            end
+        end)
 }
 
----@type table<string, CategoryMatcher>
-local categotyActions = {}
-function ProcessAction(name)
-    if not categotyActions[name] then
-        WARN("Huh?")
-        return
-    end
-    categotyActions[name]:Process(GetSelectedUnits())
-end
-
----@param actions table<string, CategoryMatcher>
-function RegisterActions(actions)
-    for name, action in actions do
-        categotyActions[name] = action
-        import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
-            {
-                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction('" .. name .. "')",
-                category = "AKA"
-            })
-        import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] = action.description
-    end
-end
 
 function Main()
-    RegisterActions(customActions)
 end
