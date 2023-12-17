@@ -1,9 +1,9 @@
 name = "Advanced Key Actions"
 version = 1
-copyright = ""
+copyright = "MIT License"
 description = [[]]
 author = "4z0t"
-url = ""
+url = "https://github.com/4z0t/FAF-UI-Mods"
 uid = "advanced-key-actions-v01"
 exclusive = false
 ui_only = true
