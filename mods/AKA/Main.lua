@@ -125,7 +125,7 @@ function RegisterActions(actions)
         categotyActions[name] = action
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
             {
-                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction(" .. name .. ")",
+                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction('" .. name .. "')",
                 category = "AKA"
             })
         import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] = action.description
