@@ -14,6 +14,7 @@ ExampleComponent = Class(IItemComponent)
         self.index = 0
         item.Layouter(self.text)
             :AtCenterIn(item)
+            :DisableHitTest()
     end,
 
     ---Called when grid item receives an event
