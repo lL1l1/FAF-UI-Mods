@@ -1,7 +1,8 @@
 local Bitmap = UMT.Controls.Bitmap
+local IComponentable = import("IComponentable.lua").IComponentable
 
----@class Item : UMT.Bitmap
-Item = UMT.Class(Bitmap)
+---@class Item : UMT.Bitmap, IComponentable
+Item = UMT.Class(Bitmap, IComponentable)
 {
 
     ---@param self Item
@@ -9,6 +10,8 @@ Item = UMT.Class(Bitmap)
         Bitmap.__init(self, parent)
 
     end,
+
+    
 
     ---@param self Item
     ---@param layouter UMT.Layouter
