@@ -22,8 +22,16 @@ Item = UMT.Class(Bitmap, IComponentable)
     ---@param name string
     ---@param action string
     EnableComponent = function(self, name, action)
-        self:DisableComponents()
-        self:SetActiveComponent(name, action)
+        if self._activeComponent ~= name then
+            self:DisableComponents()
+            self:SetActiveComponent(name)
+            local component = self:GetActiveComponent()
+            component:Enable(self)
+            component:SetAction(action)
+        else
+            local component = self:GetActiveComponent()
+            component:SetAction(action)
+        end
     end,
 
     ---@param self Item
@@ -46,10 +54,8 @@ Item = UMT.Class(Bitmap, IComponentable)
 
     ---@param self Item
     ---@param name string
-    ---@param action string
-    SetActiveComponent = function(self, name, action)
+    SetActiveComponent = function(self, name)
         self._activeComponent = name
-        self:GetActiveComponent():Enable(self, action)
     end,
 
     ---@param self Item

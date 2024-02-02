@@ -23,8 +23,13 @@ IItemComponent = Class()
     ---Called when item is activated with this component event handling
     ---@param self IItemComponent
     ---@param item Item
+    Enable = function(self, item)
+        
+    end,
+    
+    ---@param self IItemComponent
     ---@param action string
-    Enable = function(self, item, action)
+    SetAction = function (self, action)
         
     end,
     
