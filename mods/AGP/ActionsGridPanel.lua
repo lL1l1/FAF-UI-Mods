@@ -66,7 +66,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
     ---@param self ActionsGridPanel
     ---@param name string
     ---@param class fun(instance:Item):IItemComponent
-    AddComponent = function(self, name, class)
+    AddItemComponent = function(self, name, class)
         self:IterateItems(function(grid, item, row, column)
             item:AddComponent(name, class)
         end)
@@ -117,9 +117,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
     ---@param self ActionsGridPanel
     ClearGrid = function(self)
-        if not self._items then
-            return
-        end
+        if not self._items then return end
 
         self:IterateItems(function(grid, item, row, column)
             item:Destroy()
