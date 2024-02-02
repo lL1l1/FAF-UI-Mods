@@ -10,3 +10,4 @@ exclusive = false
 ui_only = true
 conflicts = {}
 __umt = true
+AGP = "ExampleHandler"
