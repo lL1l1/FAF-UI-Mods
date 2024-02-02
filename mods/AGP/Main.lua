@@ -11,9 +11,9 @@ function Main(isReplay)
         local agp = ActionsGridPanel(parent)
 
         LayoutFor(agp)
-            :AtRightBottomIn(GetFrame(0))
+            :AtRightBottomIn(GetFrame(0), 10, 10)
 
         LayoutFor(constructionPanelControls.constructionGroup)
-            :Right(agp.Left)
+            :AnchorToLeft(agp, 20)
     end)
 end

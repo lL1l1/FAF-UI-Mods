@@ -19,7 +19,7 @@ Item = UMT.Class(Bitmap, IComponentable)
         layouter(self)
             :Width(options.itemSize:Raw())
             :Height(options.itemSize:Raw())
-            :Color("66006600")
+            :Color("99000000")
     end,
 
     ---@param self Item

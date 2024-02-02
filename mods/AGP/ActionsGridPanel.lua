@@ -1,6 +1,8 @@
-local Bitmap  = UMT.Controls.Bitmap
-local Item    = import("Item.lua").Item
-local LazyVar = import('/lua/lazyvar.lua').Create
+local Bitmap     = UMT.Controls.Bitmap
+local Item       = import("Item.lua").Item
+local LazyVar    = import('/lua/lazyvar.lua').Create
+local GlowBorder = UMT.Views.GlowBorder
+
 local options = UMT.Options.Mods["AGP"]
 
 ---@class LazyNumber : LazyVar
@@ -14,7 +16,7 @@ local itemSize = options.itemSize:Raw()
 local function OffsetFn(n, l)
     return LayoutFuncs.Sum(
         LayoutFuncs.Mult(n, l),
-        LayoutFuncs.Mult(n, space)
+        LayoutFuncs.Mult(LayoutFuncs.Sum(n, 1), space)
     )
 end
 
@@ -22,12 +24,15 @@ end
 ---@field _nx LazyNumber
 ---@field _ny LazyNumber
 ---@field _items Item[][]
+---@field _border GlowBorder
 ActionsGridPanel = UMT.Class(Bitmap)
 {
 
     ---@param self ActionsGridPanel
     __init = function(self, parent)
         Bitmap.__init(self, parent)
+
+        self._border = GlowBorder(self)
 
         local nx = LazyVar()
         local ny = LazyVar()
@@ -65,11 +70,16 @@ ActionsGridPanel = UMT.Class(Bitmap)
     ---@param self ActionsGridPanel
     ---@param layouter UMT.Layouter
     InitLayout = function(self, layouter)
+
+        layouter(self._border)
+            :FillFixedBorder(self, -10)
+            :Under(self)
+            :DisableHitTest(true)
+
         layouter(self)
             :Width(OffsetFn(self._nx, itemSize))
             :Height(OffsetFn(self._ny, itemSize))
-            :DisableHitTest()
-            :Color("black")
+            :Color("22ffffff")
         self:LayoutItems()
     end,
 
