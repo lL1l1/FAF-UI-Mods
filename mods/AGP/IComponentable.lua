@@ -3,7 +3,7 @@ IComponentable = Class()
 {
     ---@generic T
     ---@param self IComponentable<T>
-    ---@return table<string,T>
+    ---@return table<string,T>?
     GetComponents = function(self)
         return self._components
     end,

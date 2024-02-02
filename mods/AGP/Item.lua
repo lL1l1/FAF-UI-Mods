@@ -1,5 +1,6 @@
 local Bitmap = UMT.Controls.Bitmap
 local IComponentable = import("IComponentable.lua").IComponentable
+local options = UMT.Options.Mods["AGP"]
 
 ---@class Item : UMT.Bitmap, IComponentable
 ---@field _activeComponent string
@@ -15,7 +16,10 @@ Item = UMT.Class(Bitmap, IComponentable)
     ---@param self Item
     ---@param layouter UMT.Layouter
     InitLayout = function(self, layouter)
-
+        layouter(self)
+            :Width(options.itemSize:Raw())
+            :Height(options.itemSize:Raw())
+            :Color("66006600")
     end,
 
     ---@param self Item
@@ -36,7 +40,12 @@ Item = UMT.Class(Bitmap, IComponentable)
 
     ---@param self Item
     DisableComponents = function(self)
-        for _, component in self:GetComponents() do
+        local components = self:GetComponents()
+        if not components then
+            return
+        end
+
+        for _, component in components do
             component:Disable(self)
         end
     end,
