@@ -84,10 +84,6 @@ Panel = UMT.Class(ActionsGridPanel)
             index, actionInfo = next(actions, index)
         end)
     end,
-
-
-
-
 }
 
 ---@type Panel
