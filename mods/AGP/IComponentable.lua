@@ -24,6 +24,9 @@ IComponentable = Class()
     ---@param class fun(instance: IComponentable<T>):T
     AddComponent = function(self, name, class)
         if self._components == nil then self._components = {} end
+        if self._components[name] ~= nil then
+            error(("Component '%s' already exists"):format(name))
+        end
         self._components[name] = class(self)
     end,
 

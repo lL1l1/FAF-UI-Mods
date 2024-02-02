@@ -54,12 +54,29 @@ ActionsGridPanel = UMT.Class(Bitmap)
     end,
 
     ---@param self ActionsGridPanel
-    DisableItems = function(self)
+    ---@param func fun(grid:ActionsGridPanel, item:Item, row:number, column:number)
+    IterateItems = function(self, func)
         for ix, row in self._items do
             for iy, item in row do
-                item:Disable()
+                func(self, item, ix, iy)
             end
         end
+    end,
+
+    ---@param self ActionsGridPanel
+    ---@param name string
+    ---@param class fun(instance:Item):IItemComponent
+    AddComponent = function(self, name, class)
+        self:IterateItems(function(grid, item, row, column)
+            item:AddComponent(name, class)
+        end)
+    end,
+
+    ---@param self ActionsGridPanel
+    DisableItems = function(self)
+        self:IterateItems(function(grid, item, row, column)
+            item:Disable()
+        end)
     end,
 
     ---@param self ActionsGridPanel
@@ -85,11 +102,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
     ---@param self ActionsGridPanel
     LayoutItems = function(self)
-        for ix, row in self._items do
-            for iy, item in row do
-                self:PositionItem(item, ix, iy)
-            end
-        end
+        self:IterateItems(self.PositionItem)
     end,
 
     ---@param self ActionsGridPanel
@@ -108,11 +121,10 @@ ActionsGridPanel = UMT.Class(Bitmap)
             return
         end
 
-        for _, row in self._items do
-            for _, item in row do
-                item:Destroy()
-            end
-        end
+        self:IterateItems(function(grid, item, row, column)
+            item:Destroy()
+        end)
+
         self._items = nil
     end,
 
