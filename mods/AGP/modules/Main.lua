@@ -53,7 +53,7 @@ Panel = UMT.Class(ActionsGridPanel)
         local actions = {}
 
         for name, handler in pairs(self._selectionHandlers) do
-            local _actions = handler:OnSelectionChange(selection)
+            local _actions = handler:OnSelectionChanged(selection)
             if not _actions then continue end
 
             for i, action in _actions do

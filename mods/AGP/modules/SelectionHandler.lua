@@ -6,7 +6,7 @@ SelectionHandler = Class()
     ---@param self SelectionHandler
     ---@param selection UserUnit[]
     ---@return string[]?
-    OnSelectionChange = function(self, selection)
+    OnSelectionChanged = function(self, selection)
     end,
 
     ---@type IItemComponent
