@@ -45,7 +45,6 @@ Panel = UMT.Class(ActionsGridPanel)
         end
     end,
 
-
     ---@param self Panel
     ---@param selection UserUnit[]
     OnSelectionChanged = function(self, selection)
