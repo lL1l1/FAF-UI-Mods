@@ -27,10 +27,10 @@ Panel = UMT.Class(ActionsGridPanel)
             end)
 
         for i, info in l do
-            local name    = info[1]
-            local handler = info[2]
+            local name         = info[1]
+            local handlerClass = info[2]
 
-            self._selectionHandlers[name] = handler
+            self._selectionHandlers[name] = handlerClass(self)
             self._order[name]             = i
         end
     end,

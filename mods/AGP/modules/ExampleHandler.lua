@@ -7,7 +7,7 @@ ExampleHandler = Class(ISelectionHandler)
     ---@param self ExampleHandler
     ---@param selection UserUnit[]
     ---@return string[]?
-    OnSelectionChange = function(self, selection)
+    OnSelectionChanged = function(self, selection)
         if table.empty(selection) then
             return
         end
