@@ -3,7 +3,7 @@ local ActionsGridPanel = import("ActionsGridPanel.lua").ActionsGridPanel
 local LuaQ = UMT.LuaQ
 
 ---@class Panel : ActionsGridPanel
----@field _selectionHandlers table<string, SelectionHandler>
+---@field _selectionHandlers table<string, ISelectionHandler>
 ---@field _order table<string, number>
 Panel = UMT.Class(ActionsGridPanel)
 {

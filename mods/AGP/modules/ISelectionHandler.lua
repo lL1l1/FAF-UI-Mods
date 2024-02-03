@@ -1,9 +1,9 @@
 local IItemComponent = import("IItemComponent.lua").IItemComponent
 
----@class SelectionHandler
-SelectionHandler = Class()
+---@class ISelectionHandler
+ISelectionHandler = Class()
 {
-    ---@param self SelectionHandler
+    ---@param self ISelectionHandler
     ---@param selection UserUnit[]
     ---@return string[]?
     OnSelectionChanged = function(self, selection)
