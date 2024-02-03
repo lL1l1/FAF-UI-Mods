@@ -50,35 +50,30 @@ Panel = UMT.Class(ActionsGridPanel)
     ---@param selection UserUnit[]
     OnSelectionChanged = function(self, selection)
         local order = self._order
+        local actions = {}
 
-        ---@type table
-        local actions = self._selectionHandlers
-            | LuaQ.select.keyvalue(function(name, handler)
-                local _actions = handler:OnSelectionChange(selection)
+        for name, handler in pairs(self._selectionHandlers) do
+            local _actions = handler:OnSelectionChange(selection)
+            if not _actions then continue end
 
-                if not _actions then
-                    return
-                end
+            for i, action in _actions do
+                table.insert(actions, {
+                    handler = name,
+                    action = action,
+                    id = i,
+                })
+            end
+        end
 
-                return _actions
-                    | LuaQ.select.keyvalue(function(i, action)
-                        return {
-                            handler = name,
-                            action = action,
-                            id = i,
-                        }
-                    end)
-            end)
-            | LuaQ.values
-            | LuaQ.concat
-            | LuaQ.sort(function(a, b)
-                local oa = order[a.handler]
-                local ob = order[b.handler]
-                if oa == ob then
-                    return a.id < b.id
-                end
-                return oa < ob
-            end)
+        table.sort(actions, function(a, b)
+            local oa = order[a.handler]
+            local ob = order[b.handler]
+            if oa == ob then
+                return a.id < b.id
+            end
+            return oa < ob
+        end)
+
         local next = next
 
         if table.empty(actions) then
