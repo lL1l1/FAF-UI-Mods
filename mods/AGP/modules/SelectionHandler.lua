@@ -5,7 +5,7 @@ SelectionHandler = Class()
 {
     ---@param self SelectionHandler
     ---@param selection UserUnit[]
-    ---@return string[]
+    ---@return string[]?
     OnSelectionChange = function(self, selection)
     end,
 

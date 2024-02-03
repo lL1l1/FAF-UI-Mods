@@ -6,8 +6,11 @@ ExampleHandler = Class(SelectionHandler)
 {
     ---@param self SelectionHandler
     ---@param selection UserUnit[]
-    ---@return string[]
+    ---@return string[]?
     OnSelectionChange = function(self, selection)
+        if table.empty(selection) then
+            return
+        end
         if table.empty(EntityCategoryFilterDown(categories.COMMAND, selection)) then
             return { 1, 2, 3 }
         end

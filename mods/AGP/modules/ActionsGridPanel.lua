@@ -50,7 +50,6 @@ ActionsGridPanel = UMT.Class(Bitmap)
         self._ny = ny
 
         self:Resize()
-        self:OnUpdate()
     end,
 
     ---@param self ActionsGridPanel
@@ -80,8 +79,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
     end,
 
     ---@param self ActionsGridPanel
-    OnUpdate = function(self)
-        self:DisableItems()
+    OnResized = function(self)
     end,
 
     ---@param self ActionsGridPanel
@@ -132,8 +130,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
         local nx = self._nx()
         local ny = self._ny()
-        LOG(nx)
-        LOG(ny)
+
         self._items = {}
         for x = 1, nx do
             self._items[x] = {}
@@ -142,7 +139,8 @@ ActionsGridPanel = UMT.Class(Bitmap)
             end
         end
         self:LayoutItems()
-        self:OnUpdate()
+        self:OnResized()
+        self:DisableItems()
     end,
 
 

@@ -33,14 +33,18 @@ Panel = UMT.Class(ActionsGridPanel)
             self._selectionHandlers[name] = handler
             self._order[name]             = i
         end
+    end,
 
+    ---@param self Panel
+    OnResized = function(self)
+        if not self._selectionHandlers then
+            self:LoadExtensions()
+        end
         for name, handler in self._selectionHandlers do
             self:AddItemComponent(name, handler.ComponentClass)
         end
-
-        reprsl(self._selectionHandlers)
-        reprsl(self._order)
     end,
+
 
     ---@param self Panel
     ---@param selection UserUnit[]
@@ -50,7 +54,13 @@ Panel = UMT.Class(ActionsGridPanel)
         ---@type table
         local actions = self._selectionHandlers
             | LuaQ.select.keyvalue(function(name, handler)
-                return handler:OnSelectionChange(selection)
+                local _actions = handler:OnSelectionChange(selection)
+
+                if not _actions then
+                    return
+                end
+
+                return _actions
                     | LuaQ.select.keyvalue(function(i, action)
                         return {
                             handler = name,
@@ -71,6 +81,12 @@ Panel = UMT.Class(ActionsGridPanel)
             end)
         local next = next
 
+        if table.empty(actions) then
+            self:Hide()
+            return
+        end
+        self:Show()
+
         local index, actionInfo = next(actions, nil)
 
         self:IterateItems(function(grid, item, row, column)
@@ -79,6 +95,13 @@ Panel = UMT.Class(ActionsGridPanel)
 
             index, actionInfo = next(actions, index)
         end)
+    end,
+
+    ---@param self Panel
+    OnDestroy = function(self)
+        ActionsGridPanel.OnDestroy(self)
+        self._selectionHandlers = nil
+        self._order = nil
     end,
 }
 
@@ -103,15 +126,13 @@ function Main(isReplay)
     ForkThread(function()
         WaitSeconds(1)
         local constructionPanelControls = import("/lua/ui/game/construction.lua").controls
-        local parent = constructionPanelControls.constructionGroup
+        local parent = import("/lua/ui/game/construction.lua").controlClusterGroup
 
         panel = Panel(parent)
 
-        panel:LoadExtensions()
-        panel:OnSelectionChanged({})
-
         LayoutFor(panel)
             :AtRightBottomIn(GetFrame(0), 10, 10)
+            :Hide()
 
         LayoutFor(constructionPanelControls.constructionGroup)
             :AnchorToLeft(panel, 20)
