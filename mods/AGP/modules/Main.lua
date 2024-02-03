@@ -45,16 +45,12 @@ Panel = UMT.Class(ActionsGridPanel)
     ---@param self Panel
     ---@param selection UserUnit[]
     OnSelectionChanged = function(self, selection)
-        local order           = self._order
-        local handlersActions = {}
-        for name, handler in pairs(self._selectionHandlers) do
-            handlersActions[name] = handler:OnSelectionChange(selection)
-        end
+        local order = self._order
 
         ---@type table
-        local actions = handlersActions
-            | LuaQ.select.keyvalue(function(name, actions)
-                return actions
+        local actions = self._selectionHandlers
+            | LuaQ.select.keyvalue(function(name, handler)
+                return handler:OnSelectionChange(selection)
                     | LuaQ.select.keyvalue(function(i, action)
                         return {
                             handler = name,
@@ -91,6 +87,8 @@ local panel = nil
 
 function OnSelectionChanged(info)
     if IsDestroyed(panel) then return end
+
+    if table.empty(info.added) and table.empty(info.removed) then return end
 
     panel:OnSelectionChanged(info.newSelection)
 end
