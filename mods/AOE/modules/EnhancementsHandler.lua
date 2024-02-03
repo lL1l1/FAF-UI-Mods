@@ -19,9 +19,13 @@ EnhancementsHandler = Class(ISelectionHandler)
         if table.empty(selection) then
             return
         end
-        if table.getn(selection) ~= 1 or table.empty(EntityCategoryFilterDown(categories.COMMAND, selection)) then
+        if table.getn(selection) ~= 1 then
             return
         end
+        if table.empty(EntityCategoryFilterDown(categories.COMMAND, selection)) then
+            return
+        end
+
         ---@type UserUnit
         local unit = selection[1]
         local bp = unit:GetBlueprint().BlueprintId
