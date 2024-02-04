@@ -9,41 +9,41 @@ local Button = import('/lua/maui/button.lua').Button
 ---@field bpID string
 ---@field name string
 
-
-
-
-
 local bpIDtoUpgradeChains = {
     ["url0001"] = {
         { "CoolingUpgrade", },
         { "AdvancedEngineering", "T3Engineering", },
         { "StealthGenerator", "FAF_SelfRepairSystem", "CloakingGenerator", },
+        { "MicrowaveLaserGenerator", },
         { "ResourceAllocation" },
+        { "Teleporter" },
     },
     ["uel0001"] = {
         { "HeavyAntiMatterCannon", },
         { "AdvancedEngineering", "T3Engineering", },
         { "Shield", "ShieldGeneratorField", },
         { "ResourceAllocation" },
+        { "Teleporter" },
     },
     ["xsl0001"] = {
         { "RateOfFire", },
         { "AdvancedEngineering", "T3Engineering", },
         { "DamageStabilization", "DamageStabilizationAdvanced", },
         { "ResourceAllocation", "ResourceAllocationAdvanced" },
+        { "Teleporter" },
     },
     ["ual0001"] = {
         { "HeatSink", },
         { "AdvancedEngineering", "T3Engineering", },
         { "Shield", "ShieldHeavy", },
         { "ResourceAllocation", "ResourceAllocationAdvanced" },
+        { "Teleporter" },
     },
 }
 
 ---@param unit  UserUnit
 local function GetAvailableUpgrades(unit)
     local bpID = unit:GetBlueprint().BlueprintId:lower()
-    local id = unit:GetEntityId()
     local chains = bpIDtoUpgradeChains[bpID]
 
     if not chains then
