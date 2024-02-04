@@ -140,7 +140,6 @@ ActionsGridPanel = UMT.Class(Bitmap)
         end
         self:LayoutItems()
         self:OnResized()
-        self:DisableItems()
     end,
 
 
@@ -156,6 +155,6 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
     ---@param self ActionsGridPanel
     Update = function(self)
-        
+        self:DisableItems()
     end,
 }

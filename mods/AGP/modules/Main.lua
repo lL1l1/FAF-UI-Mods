@@ -43,6 +43,7 @@ Panel = UMT.Class(ActionsGridPanel)
         for name, handler in self._selectionHandlers do
             self:AddItemComponent(name, handler.ComponentClass)
         end
+        self:Update()
     end,
 
     ---@param self Panel
