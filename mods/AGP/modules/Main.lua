@@ -92,6 +92,11 @@ Panel = UMT.Class(ActionsGridPanel)
     end,
 
     ---@param self Panel
+    Update = function(self)
+        self:OnSelectionChanged(GetSelectedUnits() or {})
+    end,
+
+    ---@param self Panel
     OnDestroy = function(self)
         ActionsGridPanel.OnDestroy(self)
         self._selectionHandlers = nil

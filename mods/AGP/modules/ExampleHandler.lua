@@ -1,6 +1,8 @@
 local ISelectionHandler = import("ISelectionHandler.lua").ISelectionHandler
 local IItemComponent = import("IItemComponent.lua").IItemComponent
 
+
+
 ---@class ExampleHandler : ISelectionHandler
 ExampleHandler = Class(ISelectionHandler)
 {

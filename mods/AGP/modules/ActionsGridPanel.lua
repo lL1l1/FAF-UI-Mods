@@ -153,4 +153,9 @@ ActionsGridPanel = UMT.Class(Bitmap)
         self._nx = nil
         self._ny = nil
     end,
+
+    ---@param self ActionsGridPanel
+    Update = function(self)
+        
+    end,
 }

@@ -4,6 +4,7 @@ local options = UMT.Options.Mods["AGP"]
 
 ---@class Item : UMT.Bitmap, IComponentable
 ---@field _activeComponent string
+---@field _grid ActionsGridPanel
 Item = UMT.Class(Bitmap, IComponentable)
 {
 
@@ -11,6 +12,12 @@ Item = UMT.Class(Bitmap, IComponentable)
     __init = function(self, parent)
         Bitmap.__init(self, parent)
         self._activeComponent = nil
+        self._grid = parent
+    end,
+
+    ---@param self Item
+    UpdatePanel = function(self)
+        ForkThread(self._grid.Update, self._grid)
     end,
 
     ---@param self Item
@@ -76,5 +83,6 @@ Item = UMT.Class(Bitmap, IComponentable)
     OnDestroy = function(self)
         Bitmap.OnDestroy(self)
         self:DestroyComponents()
+        self._grid = nil
     end
 }
