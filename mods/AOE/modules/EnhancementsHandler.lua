@@ -9,6 +9,59 @@ local Button = import('/lua/maui/button.lua').Button
 ---@field bpID string
 ---@field name string
 
+
+
+
+
+local bpIDtoUpgradeChains = {
+    ["url0001"] = {
+        { "CoolingUpgrade", },
+        { "AdvancedEngineering", "T3Engineering", },
+        { "StealthGenerator", "FAF_SelfRepairSystem", "CloakingGenerator", },
+        { "ResourceAllocation" },
+    },
+    ["uel0001"] = {
+        { "HeavyAntiMatterCannon", },
+        { "AdvancedEngineering", "T3Engineering", },
+        { "Shield", "ShieldGeneratorField", },
+        { "ResourceAllocation" },
+    },
+    ["xsl0001"] = {
+        { "RateOfFire", },
+        { "AdvancedEngineering", "T3Engineering", },
+        { "DamageStabilization", "DamageStabilizationAdvanced", },
+        { "ResourceAllocation", "ResourceAllocationAdvanced" },
+    },
+    ["ual0001"] = {
+        { "HeatSink", },
+        { "AdvancedEngineering", "T3Engineering", },
+        { "Shield", "ShieldHeavy", },
+        { "ResourceAllocation", "ResourceAllocationAdvanced" },
+    },
+}
+
+---@param unit  UserUnit
+local function GetAvailableUpgrades(unit)
+    local bpID = unit:GetBlueprint().BlueprintId:lower()
+    local id = unit:GetEntityId()
+    local chains = bpIDtoUpgradeChains[bpID]
+
+    if not chains then
+        return
+    end
+
+    local upgrades = {}
+    for _, chain in chains do
+        for _, upgrade in chain do
+            if not Enhancements.HasPrerequisite(unit, upgrade) then
+                table.insert(upgrades, upgrade)
+                break
+            end
+        end
+    end
+    return upgrades
+end
+
 ---@class EnhancementsHandler : ISelectionHandler
 EnhancementsHandler = Class(ISelectionHandler)
 {
@@ -29,11 +82,16 @@ EnhancementsHandler = Class(ISelectionHandler)
         ---@type UserUnit
         local unit = selection[1]
         local bp = unit:GetBlueprint().BlueprintId
+        local upgrades = GetAvailableUpgrades(unit)
 
-        return { {
-            bpID = bp,
-            name = "AdvancedEngineering",
-        } }
+        if not upgrades then return end
+
+        return upgrades | UMT.LuaQ.select(function(upgrade)
+            return {
+                bpID = bp,
+                name = upgrade,
+            }
+        end)
     end,
 
     ---@class EnhComponent : IItemComponent
@@ -56,6 +114,7 @@ EnhancementsHandler = Class(ISelectionHandler)
             self.btn.mRolloverCue = "UI_MFD_Rollover"
             self.btn.OnClick = function()
                 Enhancements.OrderEnhancement(self.name)
+                item:UpdatePanel()
             end
         end,
 
