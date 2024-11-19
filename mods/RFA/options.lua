@@ -6,6 +6,7 @@ UMT.Options.Mods["RFA"] = {
     showDirectFire = Opt(true),
     showIndirectFire = Opt(true),
     showAntiAir = Opt(true),
+    showAntiNavy = Opt(true),
     showCountermeasure = Opt(true),
     showOmni = Opt(true),
     showRadar = Opt(true),

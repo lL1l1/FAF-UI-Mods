@@ -19,6 +19,7 @@ do
     local showIndirectFire = false
     local showAntiAir = false
     local showCountermeasure = false
+    local showAntiNavy = false
     local showOmni = false
     local showRadar = false
 
@@ -56,6 +57,8 @@ do
                     TableInsert(weapons, { "AntiAir", radius })
                 elseif showCountermeasure and w.RangeCategory == "UWRC_Countermeasure" then
                     TableInsert(weapons, { "Defense", radius })
+                elseif showAntiNavy and w.RangeCategory == "UWRC_AntiNavy" then
+                    TableInsert(weapons, { "AntiNavy", radius })
                 end
             end
             return weapons
