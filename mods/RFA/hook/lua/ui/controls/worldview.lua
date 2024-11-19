@@ -18,8 +18,8 @@ do
     local showDirectFire = false
     local showIndirectFire = false
     local showAntiAir = false
-    local showCountermeasure = false
     local showAntiNavy = false
+    local showCountermeasure = false
     local showOmni = false
     local showRadar = false
 
@@ -31,6 +31,9 @@ do
     end)
     options.showAntiAir:Bind(function(opt)
         showAntiAir = opt()
+    end)
+    options.showAntiNavy:Bind(function(opt)
+        showAntiNavy = opt()
     end)
     options.showCountermeasure:Bind(function(opt)
         showCountermeasure = opt()
