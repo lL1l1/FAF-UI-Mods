@@ -33,6 +33,7 @@ function Main()
             Options.Filter("Show Indirect Fire weapon range", options.showIndirectFire, 4),
             Options.Filter("Show Anti air weapon range", options.showAntiAir, 4),
             Options.Filter("Show Countermeasure weapon range", options.showCountermeasure, 4),
+            Options.Filter("Show Anti nave weapon range", options.showAntiNavy, 4),
             Options.Filter("Show Omni range", options.showOmni, 4),
             Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Strings("Build Preview key (restart required)",
