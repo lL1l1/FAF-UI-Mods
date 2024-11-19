@@ -15,31 +15,56 @@ do
     ---@field [1] string # type
     ---@field [2] number # range
 
-    ---comment
+    local showDirectFire = false
+    local showIndirectFire = false
+    local showAntiAir = false
+    local showCountermeasure = false
+    local showOmni = false
+    local showRadar = false
+
+    options.showDirectFire:Bind(function(opt)
+        showDirectFire = opt()
+    end)
+    options.showIndirectFire:Bind(function(opt)
+        showIndirectFire = opt()
+    end)
+    options.showAntiAir:Bind(function(opt)
+        showAntiAir = opt()
+    end)
+    options.showCountermeasure:Bind(function(opt)
+        showCountermeasure = opt()
+    end)
+    options.showOmni:Bind(function(opt)
+        showOmni = opt()
+    end)
+    options.showRadar:Bind(function(opt)
+        showRadar = opt()
+    end)
+
     ---@param bp UnitBlueprint
     ---@return RingData[]?
     local function GetBPInfo(bp)
-        if bp.Weapon ~= nil and not table.empty(bp.Weapon) then
+        if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
             local weapons = {}
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
-                if w.RangeCategory == "UWRC_DirectFire" then
+                if showDirectFire and w.RangeCategory == "UWRC_DirectFire" then
                     TableInsert(weapons, { "AllMilitary", radius })
-                elseif w.RangeCategory == "UWRC_IndirectFire" then
+                elseif showIndirectFire and w.RangeCategory == "UWRC_IndirectFire" then
                     TableInsert(weapons, { "IndirectFire", radius })
-                elseif w.RangeCategory == "UWRC_AntiAir" then
+                elseif showAntiAir and w.RangeCategory == "UWRC_AntiAir" then
                     TableInsert(weapons, { "AntiAir", radius })
-                elseif w.RangeCategory == "UWRC_Countermeasure" then
+                elseif showCountermeasure and w.RangeCategory == "UWRC_Countermeasure" then
                     TableInsert(weapons, { "Defense", radius })
                 end
             end
             return weapons
         elseif bp.Intel ~= nil then
             local weapons = {}
-            if bp.Intel.OmniRadius then
+            if showOmni and bp.Intel.OmniRadius then
                 TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
             end
-            if bp.Intel.RadarRadius then
+            if showRadar and bp.Intel.RadarRadius then
                 TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
             end
             return weapons

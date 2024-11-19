@@ -3,6 +3,12 @@ UMT.Options.Mods["RFA"] = {
     hoverPreviewKey = Opt "SHIFT",
     selectedPreviewKey = Opt "SHIFT",
     buildPreviewKey = Opt "SHIFT",
+    showDirectFire = Opt(true),
+    showIndirectFire = Opt(true),
+    showAntiAir = Opt(true),
+    showCountermeasure = Opt(true),
+    showOmni = Opt(true),
+    showRadar = Opt(true),
 }
 
 function Main()
@@ -22,6 +28,12 @@ function Main()
                     "CONTROL"
                 },
                 options.selectedPreviewKey),
+            Options.Filter("Show Direct Fire weapon range", options.showDirectFire, 4),
+            Options.Filter("Show Indirect Fire weapon range", options.showIndirectFire, 4),
+            Options.Filter("Show Anti air weapon range", options.showAntiAir, 4),
+            Options.Filter("Show Countermeasure weapon range", options.showCountermeasure, 4),
+            Options.Filter("Show Omni range", options.showOmni, 4),
+            Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Strings("Build Preview key (restart required)",
                 {
                     "SHIFT",
