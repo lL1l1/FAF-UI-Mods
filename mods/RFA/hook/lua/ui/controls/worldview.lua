@@ -263,7 +263,8 @@ do
                 self:ClearBuildRings()
                 return
             end
-            local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+
+            local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.FACTORY, selection)
             if TableEmpty(engineers) then
                 self:ClearBuildRings()
                 return
