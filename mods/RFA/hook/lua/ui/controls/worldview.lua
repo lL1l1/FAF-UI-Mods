@@ -134,11 +134,12 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
-            if self.SetCustomRender then
+            local render = self.SetCustomRender and self:GetName() ~= "MiniMap"
+            if render then
                 self._hoverRings = {}
                 self._selectionRings = {}
                 self._buildRing = nil
-                self:SetCustomRender(self:GetName() ~= "MiniMap")
+                self:SetCustomRender(true)
                 self._showRings = true
             end
         end,
@@ -345,10 +346,6 @@ do
             ring:SetPosition(GetMouseWorldPos())
         end,
 
-        Update = function(self)
-
-        end,
-
         ---@param self WorldView
         OnDestroy = function(self)
             self:ClearHoverRings()
@@ -358,10 +355,22 @@ do
             self._buildRing = nil
             self._showRings = false
 
-
             oldWorldView.OnDestroy(self)
-        end
+        end,
 
+        ---@param self WorldView
+        ---@param renderable Renderable
+        ---@param id string
+        RegisterRenderable = function(self, renderable, id)
+            self.Trash:Add(renderable)
+            self.Renderables[id] = renderable
+        end,
+
+        ---@param self WorldView
+        ---@param id string
+        UnregisterRenderable = function(self, id)
+            self.Renderables[id] = nil
+        end,
     }
 
 end
